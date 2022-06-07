@@ -41,7 +41,8 @@ def calcola_arrivo(percorsi,start):
         x=random.choice(appoggio)
         return([x[1],x[2]])        
 
-
+def mostra_percorso(i):
+    return(cars_list[i].visited)
 
         
 init_simulation(100)        
@@ -49,7 +50,7 @@ df=pd.read_csv('citta.csv',delimiter=',')
 df_list=df.values.tolist()
 
 t = 0
-durata = 1
+durata = 50
 
 l = df['partenza'].tolist()
 m = list(set(l))
@@ -61,6 +62,20 @@ for j in cars_list:
 while t < durata:
     random.shuffle(cars_list)
     for a in cars_list:
-        print(calcola_arrivo(df_list,a.visited[0]))
+        target=calcola_arrivo(df_list,a.visited[-1])
+        if target[0] != 'none' and a.gasoline >= target[1]:
+            a.visited.append(target[0])
+            a.gasoline -= target[1]
     t+=1    
       
+result = pd.DataFrame()    
+
+for agent in cars_list:
+    for citta in agent.visited:
+        result = result.append({'agente':agent.car_id,
+                                'citta':citta},
+                               ignore_index= True)
+
+
+
+
